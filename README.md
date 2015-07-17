@@ -63,3 +63,7 @@ optional arguments:
   --list-layers         list layers
   --video VIDEO         video file
 ```
+
+## additions by themolco
+##    added base code for guiding to the main deepdreamer function
+## TODO: add arguments to the top level deepdreamer.py
