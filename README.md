@@ -39,9 +39,11 @@ usage: deepdreamer.py [-h] [--zoom {true,false}] [--scale SCALE]
 
 positional arguments:
   image
-
+  
 optional arguments:
   -h, --help            show this help message and exit
+  --guide {/path/to/image}
+                        guided dreams image (default: "")
   --zoom {true,false}   zoom dreams (default: true)
   --scale SCALE         scale coefficient for zoom (default: 0.05)
   --dreams DREAMS       number of images (default: 100)
@@ -64,6 +66,4 @@ optional arguments:
   --video VIDEO         video file
 ```
 
-additions by themolco
   added base code for guiding to the main deepdreamer function
-  TODO: add arguments to the top level deepdreamer.py
