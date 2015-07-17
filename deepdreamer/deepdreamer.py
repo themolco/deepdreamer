@@ -150,7 +150,7 @@ def list_layers(network="bvlc_googlenet"):
 #added _objective_guide(dst)
 def _objective_guide(dst):
     x = dst.data[0].copy()
-    y= guide_features
+    y= dst.data[0].copy()
     ch =x.shape[0]
     x =x.reshape(ch, -1)
     y = y.reshape(ch, -1)
@@ -169,18 +169,10 @@ def deepdream(
     
     # guide setup
     #if guide_path is empty, keep it that way, otherwise, open the image and define gui
-    if guide_path == ""
+    if guide_path == "":
         gui = ""
-    else
+    else:
         gui = np.float32(img_open(guide_path))
-
-    #height and width of the guide image
-    hg, wg = gui.shape[:2]
-    gsrc, gdst = net.blobs['data'], net.blobs[end]
-    gsrc.reshape(1, 3, hg, wg)
-    gsrc.data[0] = _preprocess(net, gui)
-    net.forward(end=end)
-    guide_features = dst.data[0].copy()
 
     # Select, load DNN model
     NET_FN, PARAM_FN, CHANNEL_SWAP, CAFFE_MEAN = _select_network(network)
@@ -188,6 +180,14 @@ def deepdream(
         NET_FN, PARAM_FN, mean=CAFFE_MEAN, channel_swap=CHANNEL_SWAP)
 
     img_pool = [img_path]
+
+    #height and width of the guide image
+    hg, wg = gui.shape[:2]
+    gsrc, gdst = net.blobs['data'], net.blobs[end]
+    gsrc.reshape(1, 3, hg, wg)
+    gsrc.data[0] = _preprocess(net, gui)
+    net.forward(end=end)
+    guide_features = gdst.data[0].copy()
 
     # Save settings used in a log file
     logging.info((
