@@ -25,9 +25,12 @@ Easy to configure Python program that make use of [Google's DeepDream](https://g
 * Create a deepdream video (requires ffmpeg)
 `python deepdreamer.py --video video.mp4`
 
+* Create a guided deepdream using a second (smaller) image
+`python deepdreamer.py image.jpg --guide guideimage.jpg`
+
 ## Configuration options
 ```
-usage: deepdreamer.py [-h] [--zoom {true,false}] [--scale SCALE]
+usage: deepdreamer.py [-h] [--guide {/path/to/guide/image}] [--zoom {true,false}] [--scale SCALE]
                       [--dreams DREAMS] [--itern ITERN] [--octaves OCTAVES]
                       [--octave-scale OCTAVE_SCALE] [--layers LAYERS]
                       [--clip {true,false}]
