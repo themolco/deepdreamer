@@ -48,9 +48,13 @@ def _preprocess(net, img):
 def _deprocess(net, img):
     return np.dstack((img + net.transformer.mean["data"])[::-1])
 
+# define _objective_L2 for guided dreams 
+def _objective_L2(dst):
+    dst.diff[:] = dst.data
 
+#added: objective=_objective_L2 to parameters, allows for setting a target (less dogs)
 def _make_step(
-        net, step_size=1.5, end="inception_4c/output", jitter=32, clip=True):
+        net, step_size=1.5, end="inception_4c/output", jitter=32, clip=True, objective=_objective_L2):
     """ Basic gradient ascent step. """
 
     src = net.blobs["data"]
@@ -62,7 +66,7 @@ def _make_step(
     src.data[0] = np.roll(np.roll(src.data[0], ox, -1), oy, -2)
 
     net.forward(end=end)
-    dst.diff[:] = dst.data  # specify the optimization objective
+    objective(dst)  # specify the optimization objective; changed from dst.diff[:] = dst.data
     net.backward(start=end)
     g = src.diff[0]
     # apply normalized ascent step to the input image
@@ -143,15 +147,40 @@ def list_layers(network="bvlc_googlenet"):
         NET_FN, PARAM_FN, mean=CAFFE_MEAN, channel_swap=CHANNEL_SWAP)
     net.blobs.keys()
 
+#added _objective_guide(dst)
+def _objective_guide(dst)
+    x = dst.data[0].copy()
+    y= guide_features
+    ch =x.shape[0]
+    x =x.reshape(ch, -1)
+    y = y.reshape(ch, -1)
+    A = x.T.dot(y) # compute the matrix of dot-products with guide features
+    dst.diff[0].reshape(ch,-1)[:] = y[:,A.argmax(1)] # select ones that match best
 
+#added parameter guide_path
 def deepdream(
-        img_path, zoom=True, scale_coefficient=0.05, irange=100, iter_n=10,
+        img_path, guide_path="" , zoom=True, scale_coefficient=0.05, irange=100, iter_n=10,
         octave_n=4, octave_scale=1.4, end="inception_4c/output", clip=True,
         network="bvlc_googlenet", gif=False, reverse=False, duration=0.1,
         loop=False):
     img = np.float32(img_open(img_path))
     s = scale_coefficient
     h, w = img.shape[:2]
+    
+    # guide setup
+    #if guide_path is empty, keep it that way, otherwise, open the image and define gui
+    if guide_path == ""
+        gui = ""
+    else
+        gui = np.float32(img_open(guide_path))
+
+    #height and width of the guide image
+    hg, wg = gui.shape[:2]
+    gsrc, gdst = net.blobs['data'], net.blobs[end]
+    gsrc.reshape(1, 3, hg, wg)
+    gsrc.data[0] = _preprocess(net, gui)
+    net.forward(end=end)
+    guide_features = dst.data[0].copy()
 
     # Select, load DNN model
     NET_FN, PARAM_FN, CHANNEL_SWAP, CAFFE_MEAN = _select_network(network)
@@ -172,7 +201,7 @@ def deepdream(
     for i in xrange(irange):
         img = _deepdream(
             net, img, iter_n=iter_n, octave_n=octave_n,
-            octave_scale=octave_scale, end=end, clip=clip)
+            octave_scale=octave_scale, end=end, clip=clip, objective=_objective_guide)
         img_fromarray(np.uint8(img)).save("{}_{}.jpg".format(
             img_path, i))
         if gif:
