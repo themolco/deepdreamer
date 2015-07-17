@@ -12,6 +12,7 @@ from deepdreamer.deepdreamer import deepdream, deepdream_video, list_layers
 def main():
     try:
         parser = ArgumentParser(description="Deep dreamer")
+        parser.add_argument("--guide", type=str, default="", help="guide image (default: NULL_STR)")
         parser.add_argument(
             "--zoom", choices=["true", "false"], default="true",
             help="zoom dreams (default: true)")
@@ -89,7 +90,7 @@ def main():
             if args.loop == "true":
                 loop = True
             deepdream(
-                args.image, zoom=zoom, scale_coefficient=args.scale,
+                args.image, args.guide, zoom=zoom, scale_coefficient=args.scale,
                 irange=args.dreams, iter_n=args.itern, octave_n=args.octaves,
                 octave_scale=args.octave_scale, end=args.layers, clip=clip,
                 network=args.network, gif=gif, reverse=reverse,
