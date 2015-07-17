@@ -49,7 +49,7 @@ def _deprocess(net, img):
     return np.dstack((img + net.transformer.mean["data"])[::-1])
 
 # define _objective_L2 for guided dreams 
-def _objective_L2(dst):
+def _objective_L2(dst) :
     dst.diff[:] = dst.data
 
 #added: objective=_objective_L2 to parameters, allows for setting a target (less dogs)
@@ -148,7 +148,7 @@ def list_layers(network="bvlc_googlenet"):
     net.blobs.keys()
 
 #added _objective_guide(dst)
-def _objective_guide(dst)
+def _objective_guide(dst):
     x = dst.data[0].copy()
     y= guide_features
     ch =x.shape[0]
